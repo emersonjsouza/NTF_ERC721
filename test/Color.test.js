@@ -26,10 +26,45 @@ contract('Color', (accounts) => {
       const name = await contract.name()
       assert.equal(name, 'Color');
     })
-    
+
     it('has a symbol', async () => {
       const symbol = await contract.symbol()
       assert.equal(symbol, 'COLOR');
+    })
+  })
+
+  describe('minting', async () => {
+    it('creates a new token', async () => {
+      const result = await contract.mint('#EC058E');
+      const totalSupply = await contract.totalSupply();
+      assert.equal(totalSupply, 1);
+      const event = result.logs[0].args;
+
+      assert.equal(event.tokenId.toNumber(), 1, 'id is correct');
+      assert.equal(event.from, '0x0000000000000000000000000000000000000000', 'from is correct');
+      assert.equal(event.to, accounts[0], 'to is correct');
+
+      await contract.mint('#EC058E').should.be.rejected;
+    })
+  })
+
+  describe('indexing', async () => {
+    it('lists colors', async () => {
+      await contract.mint('#CCCCCC')
+      await contract.mint('#FFFFFF')
+      await contract.mint('#000000')
+      const totalSupply = await contract.totalSupply()
+
+      let color
+      let result = []
+
+      for (var i = 1; i <= totalSupply; i++) {
+        color = await contract.colors(i - 1);
+        result.push(color)
+      }
+
+      let expected = ['#EC058E', '#CCCCCC', '#FFFFFF', '#000000']
+      assert.equal(result.join(','), expected.join(','));
     })
   })
 })
