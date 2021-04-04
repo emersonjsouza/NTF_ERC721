@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import Web3 from 'web3';
 import logo from '../logo.png';
 import './App.css';
 
 export default function App(props) {
+
+  const loadWe3 = async () => {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else {
+      window.alert('No-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+  }
+
+  useEffect(() => {
+    loadWe3();
+  }, [])
 
   return (
     <div>
